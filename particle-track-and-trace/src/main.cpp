@@ -31,14 +31,33 @@
 #include <vtkPolyDataMapper2D.h>
 #include <vtkProperty2D.h>
 #include <memory>
+// #include <algorithm>
+#include <boost/program_options.hpp>
 
 using namespace std;
+namespace po = boost::program_options;
 
 constexpr int dt = 60 * 60; // 60 sec/min * 60 mins
 
-int main() {
-  cout << "Reading data..." << endl;
+int main(int argc, char * argv[]) {
+  po::options_description desc("Allowed options");
+  desc.add_options()
+    ("help", "produce help message")
+    ("dpath", po::value<string>(), "path to 'data' folder");
+  po::variables_map vm;
+  po::store(po::parse_command_line(argc, argv, desc), vm);
+  po::notify(vm);
+  if (vm.count("help")) {
+      cout << desc << "\n";
+      return 1;
+  }
+
   string dataPath = "../../../data";
+  if (vm.count("dpath")) {
+      dataPath = vm["dpath"].as<string>();
+  }
+
+  cout << "Reading data ... file location: " << dataPath << endl;
   shared_ptr<UVGrid> uvGrid = make_shared<UVGrid>(dataPath);
   auto kernelRK4 = make_unique<RK4AdvectionKernel>(uvGrid);
   auto kernelRK4BoundaryChecked = make_unique<SnapBoundaryConditionKernel>(std::move(kernelRK4), uvGrid);

@@ -163,6 +163,45 @@ add_executable(ParticleTrackTrace MACOSX_BUNDLE main.cpp
         layers/UserStudyTimerInitialiser.h
 )
 
+SET(Boost_DIR ${Boost_DIR} CACHE PATH "Boost head directory")
+SET(Boost_INCLUDE_DIR ${Boost_INCLUDE_DIR} CACHE PATH "Boost's parent include directory")
+SET(Boost_LIBRARY_DIR_RELEASE ${Boost_LIBRARY_DIR_RELEASE} CACHE PATH "Boost library directory (release objects)")
+SET(Boost_LIBRARY_DIR_DEBUG ${Boost_LIBRARY_DIR_DEBUG} CACHE PATH "Boost library directory (debug objects)")
+if(WIN32)
+  #set(Boost_USE_STATIC_LIBS        ON) # only find static libs
+  set(Boost_USE_MULTITHREADED      ON)
+  set(Boost_USE_STATIC_RUNTIME    OFF)
+#   find_package(Boost COMPONENTS regex filesystem system thread program_options REQUIRED)
+# else()
+#   find_package(Boost REQUIRED)
+endif()
+# find_package(Boost COMPONENTS regex filesystem system thread program_options REQUIRED)
+find_package(Boost COMPONENTS program_options REQUIRED)
+
+if(Boost_FOUND)
+  list(APPEND ADDITIONAL_LIBRARY_PATHS ${BOOST_LIBRARYDIR})
+  #list(APPEND LIBRARIES ${Boost_LIBRARIES})
+  set(Boost_SUBSYSTEM "")
+  if(WIN32)
+    # list(APPEND Boost_SUBSYSTEM ${Boost_SYSTEM_LIBRARY})
+    # list(APPEND Boost_SUBSYSTEM ${Boost_FSYSTEM_LIBRARY})
+    # list(APPEND Boost_SUBSYSTEM ${Boost_REGEX_LIBRARY})
+    # list(APPEND Boost_SUBSYSTEM ${Boost_THREAD_LIBRARY})
+    list(APPEND Boost_SUBSYSTEM ${Boost_POPTIONS_LIBRARY})
+  else()
+    # list(APPEND Boost_SUBSYSTEM boost_system)
+    # list(APPEND Boost_SUBSYSTEM boost_filesystem)
+    # list(APPEND Boost_SUBSYSTEM boost_regex)
+    # list(APPEND Boost_SUBSYSTEM boost_thread)
+    list(APPEND Boost_SUBSYSTEM boost_program_options)
+  endif()
+  list(APPEND LIBRARIES ${Boost_SUBSYSTEM})
+  list(APPEND INCLUDE_DIRS ${Boost_INCLUDE_DIR})
+  link_directories(${BOOST_LIBRARYDIR})
+  link_libraries(${Boost_LIBRARIES} ${Boost_SUBSYSTEM})
+endif(Boost_FOUND)
+
+
 execute_process(
     COMMAND nc-config --includedir
     OUTPUT_VARIABLE netCDF_INCLUDE_DIR
@@ -175,7 +214,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-target_include_directories(ParticleTrackTrace PUBLIC ${netCDF_INCLUDE_DIR})
+target_include_directories(ParticleTrackTrace PUBLIC ${netCDF_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 cmake_print_variables(netCDF_INCLUDE_DIR "${NETCDFCXX_LIB_PREFIX}/lib" "${NETCDFCXX_LIB_PREFIX}/lib/x86_64-linux-gnu" NETCDF_LIBRARY)
 
@@ -187,7 +226,7 @@ cmake_print_variables(netCDF_INCLUDE_DIR NETCDFCXX_LIB_DIR NETCDF_LIBRARY NETCDF
 
 # Prevent a "command line is too long" failure in Windows.
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
-target_link_libraries(ParticleTrackTrace ${NETCDF_LIBRARY} ${VTK_LIBRARIES} sfml-audio)
+target_link_libraries(ParticleTrackTrace ${NETCDF_LIBRARY} ${VTK_LIBRARIES} sfml-audio ${Boost_LIBRARIES})
 
 # vtk_module_autoinit is needed
 vtk_module_autoinit(
@@ -202,3 +241,7 @@ add_custom_command(
         PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:main>
         VERBATIM)
 endif()
+
+# == INSTALL routine ==
+message( STATUS "Installation root directory: ${CMAKE_INSTALL_PREFIX}")
+install( TARGETS ParticleTrackTrace )
