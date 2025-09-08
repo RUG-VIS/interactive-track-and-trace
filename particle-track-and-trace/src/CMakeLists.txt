@@ -171,21 +171,23 @@ execute_process(
 
 execute_process(
     COMMAND ncxx4-config --prefix
-    OUTPUT_VARIABLE NETCDFCXX_LIB_DIR
+    OUTPUT_VARIABLE NETCDFCXX_LIB_PREFIX
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 target_include_directories(ParticleTrackTrace PUBLIC ${netCDF_INCLUDE_DIR})
 
-cmake_print_variables(netCDF_INCLUDE_DIR "${NETCDFCXX_LIB_DIR}/lib" NETCDF_LIB)
+cmake_print_variables(netCDF_INCLUDE_DIR "${NETCDFCXX_LIB_PREFIX}/lib" "${NETCDFCXX_LIB_PREFIX}/lib/x86_64-linux-gnu" NETCDF_LIBRARY)
 
-find_library(NETCDF_LIB NAMES netcdf-cxx4 netcdf_c++4 PATHS "${NETCDFCXX_LIB_DIR}/lib" NO_DEFAULT_PATH)
+find_library(NETCDF_LIBRARY NAMES netcdf-cxx4 netcdf_c++4 PATHS "${NETCDFCXX_LIB_PREFIX}/lib" "${NETCDFCXX_LIB_PREFIX}/lib/x86_64-linux-gnu" NO_DEFAULT_PATH)
+get_filename_component(NETCDFCXX_LIB_DIR ${NETCDF_LIBRARY} DIRECTORY)
+get_filename_component(NETCDFCXX_LIBNAME ${NETCDF_LIBRARY} NAME_WE)
 
-cmake_print_variables(netCDF_INCLUDE_DIR "${NETCDFCXX_LIB_DIR}/lib" NETCDF_LIB)
+cmake_print_variables(netCDF_INCLUDE_DIR NETCDFCXX_LIB_DIR NETCDF_LIBRARY NETCDFCXX_LIBNAME)
 
 # Prevent a "command line is too long" failure in Windows.
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
-target_link_libraries(ParticleTrackTrace ${NETCDF_LIB} ${VTK_LIBRARIES} sfml-audio)
+target_link_libraries(ParticleTrackTrace ${NETCDF_LIBRARY} ${VTK_LIBRARIES} sfml-audio)
 
 # vtk_module_autoinit is needed
 vtk_module_autoinit(
