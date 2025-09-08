@@ -37,7 +37,9 @@
 using namespace std;
 namespace po = boost::program_options;
 
-constexpr int dt = 60 * 60; // 60 sec/min * 60 mins
+// constexpr int dt = 60 * 60; // 60 sec/min * 60 mins
+// ---- activate for quarter-hourly file ---- //
+constexpr int dt = 60 * 15; // 60 sec/min * 15 mins
 
 int main(int argc, char * argv[]) {
   po::options_description desc("Allowed options");
