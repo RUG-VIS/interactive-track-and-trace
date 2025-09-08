@@ -6,6 +6,7 @@
 #include "../statistics/Statistic.h"
 
 #include <vtkTextActor.h>
+#include <memory>
 
 class BadgeCounter : public Layer {
 public:

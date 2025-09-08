@@ -1,12 +1,12 @@
 #ifndef PARTICLECOLLISION_H
 #define PARTICLECOLLISION_H
 
-
-#include <vtkPoints.h>
-#include <memory.h>
-
 #include "Layer.h"
 #include "../collisions/ParticleCollisionCallback.h"
+
+
+#include <vtkPoints.h>
+#include <memory>
 
 /**
  * Invisible layer that checks collisions every timestep between position and multiple sets of points.

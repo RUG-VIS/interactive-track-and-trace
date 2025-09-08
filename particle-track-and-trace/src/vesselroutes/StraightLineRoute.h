@@ -1,8 +1,8 @@
 #ifndef STRAIGHTLINEROUTE_H
 #define STRAIGHTLINEROUTE_H
 
-#include <vector>
 #include "VesselRoute.h"
+#include <vector>
 
 /**
  * StraightLineRoute allows adding keypoints which are points in (duration, lon, lat) space. This vessel route will then

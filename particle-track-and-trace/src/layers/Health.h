@@ -3,6 +3,7 @@
 
 #include "Layer.h"
 #include "../gameovers/GameoverCallback.h"
+#include <memory>
 
 class Health : public Layer {
 public:

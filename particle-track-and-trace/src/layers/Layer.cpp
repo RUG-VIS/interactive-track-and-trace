@@ -21,7 +21,9 @@ void Layer::setCamera(vtkCamera *camera) {
   this->getLayer()->SetActiveCamera(camera);
 }
 
-Layer::Layer() { }
+Layer::Layer() {
+  // this->renderer = vtkSmartPointer<vtkRenderer>::New();
+}
 
 void Layer::handleGameOver() {
   // By default, do nothing

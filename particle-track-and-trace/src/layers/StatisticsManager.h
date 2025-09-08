@@ -3,6 +3,7 @@
 
 #include "Layer.h"
 #include "../statistics/Statistic.h"
+#include <memory>
 
 class StatisticsManager : public Layer {
 public:
